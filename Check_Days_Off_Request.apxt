@@ -1,0 +1,40 @@
+trigger Check_Days_Off_Request on Days_Off_Request__c (before insert, before update) {
+    String sError='';
+    for (Days_Off_Request__c dor: Trigger.new) {
+        for (Days_Off_Request__c  dorError : [select Id, Start_Date__c, End_Date__c, Reason__c 
+            FROM Days_Off_Request__c 
+            WHERE Employee__c=:dor.Employee__c and Id!=:dor.Id and
+                ((Start_Date__c >: dor.Start_Date__c and Start_Date__c <: dor.End_Date__c) or 
+                (End_Date__c >: dor.Start_Date__c and End_Date__c <: dor.End_Date__c) or 
+                (Start_Date__c <: dor.Start_Date__c and End_Date__c >: dor.Start_Date__c) or 
+                (Start_Date__c <: dor.End_Date__c and End_Date__c >: dor.End_Date__c)) ]){ sError+='-' + dorError.Reason__c + ' from ' + 
+                dorError.Start_Date__c.format() + ' to ' + 
+                dorError.End_Date__c.format() +'<BR>';
+        }
+        if(!sError.equals('')){ sError='Error on periods... :<BR>' + sError; }
+        dor.nbDays__c=Utils.getDiffBusinessDays(dor.Start_Date__c, dor.End_Date__c,dor.Start_AM_PM__c,dor.End_AM_PM__c);
+        Decimal nbDaysLeft=1000;
+        Employee__c e=[Select Vacation_Days_Left__c,Sick_Days_Left__c,Personal_Days_Left__c,Days_Off_Approver__c
+                         from Employee__c where Id=:dor.Employee__c];
+        if(dor.Reason__c.equals('Vacation')){
+            nbDaysLeft=e.Vacation_Days_Left__c;
+        }else{
+            if(dor.Reason__c.equals('Sick Day')){
+                nbDaysLeft=e.Sick_Days_Left__c;
+            }else{
+                if(dor.Reason__c.equals('Personal Day')){
+                    nbDaysLeft=e.Personal_Days_Left__c;
+                }
+            }
+        }
+        if(Trigger.isInsert){
+            if(dor.nbDays__c>nbDaysLeft){ sError+='You took too many days. Number of days left : ' + nbDaysLeft;}
+        }
+        if(!sError.equals('')){ dor.addError(sError);}
+        //Update Days Off Approver
+        dor.Approver__c=e.Days_Off_Approver__c;
+        
+        //Update Approval-Decline Date
+        if(dor.Status__c=='Approved'||dor.Status__c=='Declined'){dor.App_Dec_Date__c =date.today();}
+    }
+}
