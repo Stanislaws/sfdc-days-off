@@ -1,0 +1,85 @@
+/**
+* @description provides data for the Days Off Info page
+*/ 
+public class DaysOffInfo{
+    
+    public Emp userEmp{get;set;}
+    public List<Emp> lEmps{get;set;}
+    public class Emp{
+        public String name{get;set;}
+        public Double vd{get;set;}
+        public Double vdP{get;set;}
+        public Double vdA{get;set;}
+        public Double vdL{get;set;}
+        public Double co{get;set;}
+        public Double sd{get;set;}
+        public Double sdT{get;set;}
+        public Double sdL{get;set;}
+        public Double pd{get;set;}
+        public Double pdT{get;set;}
+        public Double pdL{get;set;}
+        public Double oT{get;set;}
+    }
+    public Boolean bShowEmps{get;set;}
+    public Boolean bShowMyInfo{get;set;}
+    
+    public DaysOffInfo(){
+        getDaysOffInfo();
+    }
+    /**
+     * gets the days off info
+     */ 
+    @TestVisible
+    private void getDaysOffInfo(){
+        bShowMyInfo = true;
+        //get the currently logged on user's alias
+        User u=[Select Alias FROM User where id=:UserInfo.getUserId() LIMIT 1];
+        userEmp=new Emp();
+        Employee__c e = new Employee__c();
+        try{
+            //fix for index out of bounds, human readable error shown on VF page
+            e=[Select Sick_Days_Left__c,Sick_Days__c,Sick_Days_Taken__c,
+               Vacation_Days__c,Vacation_Days_Approved__c,Vacation_Days_Left__c,Vacation_Days_Pending__c,
+               Carry_Over__c,Personal_Days_Left__c,Personal_Days__c,Personal_Days_taken_c__c,Other_Days_Taken__c 
+               FROM Employee__c WHERE Name=:u.Alias LIMIT 1];} catch(Exception ex){ bShowMyInfo = false;
+        }
+        
+        if(e!=null){
+            userEmp.vd=e.Vacation_Days__c;
+            userEmp.vdP=e.Vacation_Days_Pending__c;
+            userEmp.vdA=e.Vacation_Days_Approved__c;
+            userEmp.vdL=e.Vacation_Days_Left__c;
+            userEmp.co=e.Carry_Over__c;
+            userEmp.sd=e.Sick_Days__c;
+            userEmp.sdT=e.Sick_Days_Taken__c;
+            userEmp.sdL=e.Sick_Days_Left__c;
+            userEmp.pd=e.Personal_Days__c;
+            userEmp.pdT=e.Personal_Days_taken_c__c;
+            userEmp.pdL=e.Personal_Days_Left__c;
+            userEmp.oT=e.Other_Days_Taken__c;
+            lEmps=new List<Emp>();
+            
+            for (Employee__c f : [Select Full_Name__c,Sick_Days_Left__c,Sick_Days__c,Sick_Days_Taken__c,
+                                  Vacation_Days__c,Vacation_Days_Approved__c,Vacation_Days_Left__c,Vacation_Days_Pending__c,
+                                  Carry_Over__c,Personal_Days_Left__c,Personal_Days__c,Personal_Days_taken_c__c,Other_Days_Taken__c FROM Employee__c 
+                                  WHERE Active__c=true AND Days_Off_Approver__c=:u.id]){
+                                      Emp uEmp=new Emp();
+                                      uEmp.name=f.Full_Name__c;
+                                      uEmp.vd=f.Vacation_Days__c;
+                                      uEmp.vdP=f.Vacation_Days_Pending__c;
+                                      uEmp.vdA=f.Vacation_Days_Approved__c;
+                                      uEmp.vdL=f.Vacation_Days_Left__c;
+                                      uEmp.co=f.Carry_Over__c;
+                                      uEmp.sd=f.Sick_Days__c;
+                                      uEmp.sdT=f.Sick_Days_Taken__c;
+                                      uEmp.sdL=f.Sick_Days_Left__c;
+                                      uEmp.pd=f.Personal_Days__c;
+                                      uEmp.pdT=f.Personal_Days_taken_c__c;
+                                      uEmp.pdL=f.Personal_Days_Left__c;
+                                      uEmp.oT=f.Other_Days_Taken__c;          
+                                      lEmps.add(uEmp);
+                                  }
+            bShowEmps=(lEmps.size()>0);
+        }
+    }
+}
