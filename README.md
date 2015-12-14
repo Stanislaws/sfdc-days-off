@@ -12,4 +12,4 @@
     You should have received a copy of the GNU General Public License
     along with this program.  If not, see <http://www.gnu.org/licenses/>.
     
-Provides functionality in Salesforce for employees to schedule days off, view others days off and save the dates to their outlook calendars. Declarative parts not included.
+Provides functionality in Salesforce for employees to schedule days off, view others days off and save the dates to their outlook calendars. Declarative parts not included. Visualforce pages use JQuery v1.x.x and nh popup (https://github.com/nhoening/popup.js).
