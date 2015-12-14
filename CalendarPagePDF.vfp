@@ -1,0 +1,27 @@
+<apex:page standardController="Days_Off_Request__c" extensions="CalendarController"
+           tabStyle="Days_Off_Calendar__tab" renderAs="PDF">
+    <apex:stylesheet value="{!$Resource.CalendarPage}"/>
+    <apex:form >
+        <table width="100%" cellspacing="0" border="0" align="center">
+            <tr>
+                <td align="center" style="font-size:2.5em;font-weight:bold;">
+                	<apex:outputLabel id="monthname" value="    {!MonthName}    "/>
+                </td>
+            </tr>                
+        </table>
+        <apex:outputPanel id="Calendar">            
+            <table width="100%" cellspacing="0" bordercolor="#E8E8E8" border="1" align="center">
+                <apex:repeat value="{!listEmployees}" var="emp">
+                    <tr>                    
+                        <apex:repeat value="{!emp}" var="days">
+                            <td style="font-size:9px;{!days.color}" bgColor="{!days.BgColor}" 
+                                align="{!days.Align}" colspan="{!days.ColSpan}" width="{!days.Width}%">
+                                <apex:outputText escape="false" value="{!days.Text}" />
+                            </td>                            
+                        </apex:repeat>
+                    </tr>
+                </apex:repeat>                    
+            </table>
+        </apex:outputPanel>
+    </apex:form>
+</apex:page>
