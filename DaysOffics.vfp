@@ -1,0 +1,13 @@
+<apex:page contentType="text/calendar" cache="false" standardController="Days_Off_Request__c" extensions="DaysOfficse">
+BEGIN:VCALENDAR
+VERSION:2.0
+PRODID:-//SGEF//Salesforce//Calendar
+BEGIN:VEVENT
+SUMMARY:<apex:outputText value="{!Days_Off_Request__c.Reason__c} "/>for<apex:outputText value=" {!Days_Off_Request__c.Employee__r.Full_Name__c}"/>
+UID:<apex:outputText value="{!Days_Off_Request__c.Id}"/>
+DESCRIPTION:<apex:outputText value="{!Days_Off_Request__c.Reason__c} "/>for<apex:outputText value=" {!Days_Off_Request__c.Employee__r.Full_Name__c}."/>
+DTSTART:<apex:outputText value="{!StartDate}"/>
+DTEND:<apex:outputText value="{!EndDate}"/>
+END:VEVENT
+END:VCALENDAR
+</apex:page>
