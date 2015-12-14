@@ -1,0 +1,108 @@
+/**
+ * Pulls and formats all current days off requests into an ICS file for an employee
+ * @see DaysOfficse
+ */ 
+public class EmployeeICSExt {
+    @TestVisible
+    private List<Days_Off_Request__c> ldor;
+    @TestVisible
+    private Employee__c emp;
+    public EmployeeICSExt(ApexPages.StandardController s){
+        ldor = getDorData(s);
+        emp = getEmpData(s); 
+        setUniqueFileName(emp);
+    }
+    /**
+     * sets the unique file name for a given employee__c
+     */ 
+    @TestVisible
+    private void setUniqueFileName(Employee__c emp){
+        Date t = date.today();
+        ApexPages.currentPage().getHeaders().put('content-disposition', 'attachment; filename=' +
+                                                 emp.Full_Name__c + '\'s Days Off as of ' + t.format()
+                                                 + '.ics');
+    }
+    /**
+     * returns a list of days off requests 
+     */ 
+    @TestVisible
+    private List<Days_Off_Request__c> getDorData(ApexPages.StandardController s){
+        List<Days_Off_Request__c> d;
+        d = [SELECT Start_Date__c, End_Date__c, Start_AM_PM__c, End_AM_PM__c, Name, Reason__c,
+             EmpName__c, Id, Status__c
+             FROM Days_Off_Request__c
+             WHERE Employee__c = :s.getId()
+             AND Start_Date__c >= TODAY
+             AND (Status__c = 'Approved' OR Status__c = 'Submitted')];
+        return d;
+    }
+    /**
+     * returns employee data
+     */ 
+    @TestVisible
+    private Employee__c getEmpData(ApexPages.StandardController s){
+    	Employee__c e;
+        e = [SELECT Full_Name__c 
+             FROM Employee__c 
+             WHERE Id = :s.getId()];
+        return e;
+    }
+    /**
+     * returns the start date for a given days off request with start time either 8am or 1pm
+     */ 
+    @TestVisible
+    private String StartDate(Days_Off_Request__c dor){
+        Date sd = dor.Start_Date__c;
+        
+        String year = String.valueOf(sd.year());
+        String month;
+        //prefix the month with a zero if before october
+        if(sd.month() < 10) month = '0' + String.valueOf(sd.month()); 
+        else month = String.valueOf(sd.month());
+        
+        String day = String.valueOf(sd.day());
+        
+        String ampm;
+        if(dor.Start_AM_PM__c == 'AM') ampm = 'T080000'; 
+        else ampm = 'T130000';
+        
+        return year + month + day + ampm;            
+    }
+    /**
+     * returns an end date for given days off request with end time either 12pm or 5pm
+     */ 
+    @TestVisible
+    private String EndDate(Days_Off_Request__c dor){
+        Date ed = dor.End_Date__c;
+        
+        String year = String.valueOf(ed.year());
+        String month;
+
+        if(ed.month() < 10) month = '0' + String.valueOf(ed.month());
+        else month = String.valueOf(ed.month());
+        
+        String day = String.valueOf(ed.day());
+        
+        String ampm;
+
+        if(dor.End_AM_PM__c == 'AM') ampm = 'T120000';
+        else ampm = 'T170000';
+        
+        return year + month + day + ampm;
+    }
+    /**
+     * gets the ics file
+     */ 
+    public String getICS() {
+        String text = '';
+        for(Integer i = 0; i < ldor.size(); i++){
+            text += '\nBEGIN:VEVENT';
+            text += '\nSUMMARY:' + ldor.get(i).Reason__c + ' for ' + emp.Full_Name__c;
+            text += '\nUID:' + ldor.get(i).Id;
+            text += '\nDESCRIPTION:' + ldor.get(i).Reason__c + ' for ' + emp.Full_Name__c + '.';
+            text += '\nDTSTART:' + StartDate(ldor.get(i));
+            text += '\nDTEND:' + EndDate(ldor.get(i));
+            text += '\nEND:VEVENT';}
+        return text;
+    }
+}
