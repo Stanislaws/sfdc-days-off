@@ -1,0 +1,72 @@
+/**
+ * Pulls and formats data for ICS file download for individual days off requests
+ */ 
+public class DaysOfficse {
+    @TestVisible
+    private final Days_Off_Request__c dor;
+    
+    public DaysOfficse(ApexPages.StandardController s) {
+        dor = getDaysOffRequest(s);
+        setFileName();
+    }
+    /**
+     * gets the days of request data
+     */ 
+    @TestVisible
+    private Days_Off_Request__c getDaysOffRequest(ApexPages.StandardController s){
+        return [SELECT Start_Date__c, End_Date__c, Start_AM_PM__c, End_AM_PM__c, Name, Reason__c, EmpName__c
+                FROM Days_Off_Request__c
+                WHERE Id = :s.getId()];
+    }
+    /**
+     * sets the filename to be Name Reason for EmpName.ics
+     */ 
+    @TestVisible
+    private void setFileName(){
+        ApexPages.currentPage().getHeaders().put('content-disposition', 'attachment; filename=' 
+                                                 + dor.Name + ' ' + dor.Reason__c + ' for ' 
+                                                 + dor.EmpName__c + '.ics');
+    }
+    /**
+     * Convert StartDate to iCal format, with start time either 8am or 1pm
+     * @return a string like 20150101T080000
+     */ 
+    public String getStartDate() {
+        Date sd = dor.Start_Date__c;
+        
+        String year = String.valueOf(sd.year());
+        String month;
+        if(sd.month() < 10) month = '0' + String.valueOf(sd.month());
+        else month = String.valueOf(sd.month());
+        
+        String day = String.valueOf(sd.day());
+        
+        String ampm;
+        
+        if(dor.Start_AM_PM__c == 'AM') ampm = 'T080000';
+        else ampm = 'T130000';
+        
+        return year + month + day + ampm;
+    }
+    /**
+     * Convert EndDate to iCal format, with end time either 12pm or 5pm
+     * @return a string like 20150101T120000
+     */ 
+    public String getEndDate() {
+        Date ed = dor.End_Date__c;
+        
+        String year = String.valueOf(ed.year());
+        String month;
+        if(ed.month() < 10)month = '0' + String.valueOf(ed.month()); 
+        else month = String.valueOf(ed.month());
+        
+        String day = String.valueOf(ed.day());
+        
+        String ampm;
+
+        if(dor.End_AM_PM__c == 'AM') ampm = 'T120000'; 
+        else ampm = 'T170000';
+        
+        return year + month + day + ampm; 
+    }
+}
