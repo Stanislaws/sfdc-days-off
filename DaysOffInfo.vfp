@@ -1,0 +1,42 @@
+<apex:page controller="DaysOffInfo" title="Days Off Information">
+    <apex:includeScript value="{!$Resource.jquery}"/>
+    <apex:includeScript value="{!$Resource.tablesorter}"/>
+    <apex:includeScript value="{!$Resource.tablesorterinit}" />
+    <apex:pageblock title="Days Off Information">
+        <apex:outputText rendered="{!NOT(bShowMyInfo)}" value="Could'nt find a matching employee record for your user alias. Please contact a SGEF Salesforce administrator (not helpdesk)." />
+        <apex:pageblockSection title="My Information" collapsible="false" columns="2" rendered="{!bShowMyInfo}">
+            <apex:outputText label="Vacation Days" value="{!userEmp.vd}"/>
+            <apex:outputText label="Carry Over" value="{!userEmp.co}"/>
+            <apex:outputText label="Vacation Days Pending" value="{!userEmp.vdP}"/>
+            <apex:outputText label="Vacation Days Approved" value="{!userEmp.vdA}"/>
+            <apex:pageBlockSectionItem ></apex:pageBlockSectionItem>
+            <apex:outputText label="Vacation Days Left" value="{!userEmp.vdL}"/>
+            <apex:outputText label="Personal Days" value="{!userEmp.pd}"/>
+            <apex:pageBlockSectionItem ></apex:pageBlockSectionItem>
+            <apex:outputText label="Personal Days Taken" value="{!userEmp.pdT}"/>
+            <apex:outputText label="Personal Days Left" value="{!userEmp.pdL}"/>
+            <apex:outputText label="Sick Days" value="{!userEmp.sd}"/>
+            <apex:pageBlockSectionItem ></apex:pageBlockSectionItem>
+            <apex:outputText label="Sick Days Taken" value="{!userEmp.sdT}"/>
+            <apex:outputText label="Sick Days Left" value="{!userEmp.sdL}"/>
+            <apex:outputText label="Other Days Taken" value="{!userEmp.oT}"/>
+        </apex:pageblockSection>        
+    </apex:pageblock> 
+    <apex:pageblock title="My Team's info" rendered="{!bShowEmps}">
+        <apex:pageblocktable value="{!lEmps}" var="e"> 
+            <apex:column headerValue="Employee" value="{!e.name}"/>
+            <apex:column headerValue="Vacation" value="{!e.vd}"/>
+            <apex:column headerValue="Carry Over" value="{!e.co}"/>
+            <apex:column headerValue="V Pending" value="{!e.vdP}"/>
+            <apex:column headerValue="V Approved" value="{!e.vdA}"/>
+            <apex:column headerValue="V Left" value="{!e.vdL}"/>
+            <apex:column headerValue="Personal" value="{!e.pd}"/>
+            <apex:column headerValue="P Taken" value="{!e.pdT}"/>
+            <apex:column headerValue="P Left" value="{!e.pdL}"/>
+            <apex:column headerValue="Sick" value="{!e.sd}"/>
+            <apex:column headerValue="S Taken" value="{!e.sdT}"/>
+            <apex:column headerValue="S Left" value="{!e.sdL}"/>
+            <apex:column headerValue="Other" value="{!e.oT}"/>
+        </apex:pageblocktable>
+    </apex:pageblock>        
+</apex:page>
