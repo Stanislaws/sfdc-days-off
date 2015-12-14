@@ -1,0 +1,5 @@
+<apex:page contentType="text/calendar" cache="false" standardController="Employee__c" extensions="EmployeeICSExt">BEGIN:VCALENDAR
+VERSION:2.0
+PRODID:-//SGEF//Salesforce//Calendar<apex:outputText value="{!ICS}" escape="false"/>
+END:VCALENDAR
+</apex:page>
