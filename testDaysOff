@@ -1,0 +1,152 @@
+/**
+ * This class contains unit tests for validating the behavior of Apex classes and triggers.
+ * <p>
+ * Unit tests are class methods that verify whether a particular piece
+ * of code is working properly. Unit test methods take no arguments,
+ * commit no data to the database, and are flagged with the testMethod
+ * keyword in the method definition.
+ * <p>
+ * All test methods in an organization are executed whenever Apex code is deployed
+ * to a production organization to confirm correctness, ensure code
+ * coverage, and prevent regressions. All Apex classes are
+ * required to have at least 75% code coverage in order to be deployed
+ * to a production organization. In addition, all triggers must have some code coverage.
+ * <p>
+ * The @isTest class annotation indicates this class only contains test
+ * methods. Classes defined with the @isTest annotation do not count against
+ * the organization size limit for all Apex scripts.
+ * <p>
+ * See the Apex Language Reference for more information about Testing and Code Coverage.
+ * @see DaysOff
+ */
+@isTest
+private class testDaysOff{
+    
+    static testMethod void myUnitTest() { 
+        
+        User u=[Select Alias FROM User WHERE id=:UserInfo.getUserId()].get(0);
+        Employee__c e=new Employee__c ();
+        e.Name=u.Alias;
+        e.First_Name__c='ff';
+        e.Vacation_Days__c=40;
+        e.Sick_Days__c=40;
+        e.Personal_Days__c=40;
+        e.Active__c=true;
+        insert e;
+        e=[Select id,OwnerId,Days_Off_Approver__c from Employee__c].get(0);
+        e.Days_Off_Approver__c=u.Id;
+        update e;
+        
+        
+        Days_Off_Request__c dor=new Days_Off_Request__c();
+        dor.Start_Date__c=date.today();
+        dor.End_Date__c=date.today();
+        dor.Start_AM_PM__c='AM';
+        dor.End_AM_PM__c='PM';
+        dor.Reason__c='TEST';
+        dor.Employee__c=e.id;
+        dor.Status__c='Submitted';
+        insert dor;
+        //MyTodo
+        //ProcessInstanceWorkitem piw = new ProcessInstanceWorkitem();
+        //Required fields are missing: [ProcessInstanceId, CurrentNodeId, OriginalActorId, RemindersSent]
+        //insert piw;
+        MyTodo td= new MyTodo();
+        
+        
+        //dor=[select Id,reason__c,Status__c,Start_AM_PM__c from Days_Off_Request__c limit 1];
+        dor.Reason__c='Sick Day';
+        update dor;
+        
+        CalendarController cc = new CalendarController();
+        cc.genCalendar();
+        cc.prevMonth();
+        cc.nextMonth();
+        
+        cc.getMonthName();
+        
+        dor.Reason__c='Personal Day';
+        update dor;
+        dor.Status__c='Canceled';
+        update dor;
+        
+        DaysOffInfo d=new DaysOffInfo();
+        
+        
+    }
+    static testMethod void DaysOfficse(){
+        User u=[Select Alias FROM User WHERE id=:UserInfo.getUserId()].get(0);
+        Employee__c e=new Employee__c ();
+        e.Name=u.Alias;
+        e.First_Name__c='ff';
+        e.Vacation_Days__c=40;
+        e.Sick_Days__c=40;
+        e.Personal_Days__c=40;
+        e.Active__c=true;
+        insert e;
+        e=[Select id,OwnerId,Days_Off_Approver__c from Employee__c].get(0);
+        e.Days_Off_Approver__c=u.Id;
+        update e;
+        
+        
+        //Test DaysOfficse       
+        Days_Off_Request__c dor = new Days_Off_Request__c();
+        Date t = date.newInstance(2014, 1, 6);
+        dor.Start_AM_PM__c='AM';
+        dor.End_AM_PM__c = 'PM';
+        dor.Reason__c='TEST';
+        dor.Employee__c=e.id;
+        dor.Status__c='Submitted';
+        dor.Start_Date__c = t;
+        dor.End_Date__c = t;
+        insert dor;
+        
+        ApexPages.StandardController s = new ApexPages.StandardController(dor); 
+        DaysOfficse di = new DaysOfficse(s);
+        di.getStartDate();
+        di.getEndDate();
+        
+        t = date.newInstance(2014, 12, 15);
+        dor.End_AM_PM__c = 'AM';
+        dor.Start_AM_PM__c = 'PM';
+        dor.Start_Date__c = t;
+        dor.End_Date__c = t;
+        update dor;
+        di.getStartDate();
+        di.getEndDate();
+    }
+    static testMethod void EmployeeICSExt(){
+        User u=[Select Alias FROM User WHERE id=:UserInfo.getUserId()].get(0);
+        Employee__c e=new Employee__c ();
+        e.Name=u.Alias;
+        e.First_Name__c='ff';
+        e.Vacation_Days__c=40;
+        e.Sick_Days__c=40;
+        e.Personal_Days__c=40;
+        e.Active__c=true;
+        insert e;
+        
+        ApexPages.StandardController sc = new ApexPages.StandardController(e);
+        EmployeeICSExt ei = new EmployeeICSExt(sc);
+        ei.setUniqueFileName(e);
+        ei.ldor = ei.getDorData(sc);
+        ei.emp = ei.getEmpData(sc);
+        
+        Days_Off_Request__c dor = new Days_Off_Request__c();
+        Date t = date.newInstance(2014, 1, 6);
+        dor.Start_AM_PM__c='AM';
+        dor.End_AM_PM__c = 'PM';
+        dor.Reason__c='TEST';
+        dor.Employee__c=e.id;
+        dor.Status__c='Submitted';
+        dor.Start_Date__c = t;
+        dor.End_Date__c = t;
+        insert dor;
+        
+        ei.StartDate(dor);
+        ei.EndDate(dor);
+        
+        ei.getICS();
+    }
+    
+}
