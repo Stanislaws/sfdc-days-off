@@ -1,0 +1,33 @@
+<apex:page controller="CalendarController" tabStyle="Days_Off_Calendar__tab" 
+           standardStylesheets="false" sidebar="false" cache="false" docType="html-5.0" >
+    <apex:stylesheet value="{!$Resource.CalendarPage}"/>
+    <apex:includeScript value="{!$Resource.jquery}"/>
+    <apex:includeScript value="{!$Resource.popup}"/>
+    <apex:form >
+        <table cellspacing="0" border="0" class="max c">
+            <tr>
+                <td class="c command">
+                    <apex:commandLink reRender="monthname,Calendar,printlink" action="{!prevMonth}">&lt;</apex:commandLink>
+                    <h2 class="mainTitle">    
+                        <apex:outputLabel id="monthname" value="{!MonthName}"/>    
+                    </h2>
+                    <apex:commandLink reRender="monthname,Calendar,printlink" action="{!nextMonth}">&gt;</apex:commandLink>
+                </td>
+                <td align='right'><apex:outputLink id="printlink" target="_blank" value="/apex/CalendarPagePDF?m={!Month}">Printable Version</apex:outputLink> </td>
+            </tr>                
+        </table>
+        
+        <apex:outputPanel id="Calendar">            
+            <table cellspacing="0" bordercolor="#E8E8E8" border="1" class="max c">
+                <apex:repeat value="{!listEmployees}" var="emp">
+                    <tr>                    
+                        <apex:repeat value="{!emp}" var="days">
+                            <apex:outputText escape="false" value="{!days.column}" />                
+                        </apex:repeat>
+                    </tr>
+                </apex:repeat>                    
+            </table>
+        </apex:outputPanel>
+    </apex:form>
+    
+</apex:page>
