@@ -1,0 +1,167 @@
+a,a:hover,td:hover a {
+  text-decoration: none;
+}
+
+a:visited,td:visted a {
+  text-decoration: none;
+}
+.w a{
+    color: #FFF;
+}
+#pup {
+  position: absolute;
+  z-index: 200;
+  padding: 3px;
+  margin-left: 10px;
+  margin-top: 5px;
+  width: 250px;
+  border: 1px solid #000;
+  background-color: #777;
+  color: rgba(255,255,255,.9);
+  font-size: .95em;
+  background-color: rgba(0,0,0,.6);
+}
+
+.w {
+  color: #FFF;
+}
+
+.e {
+  width: 20%;
+}
+
+.h {
+  width: 2%;
+}
+
+.b {
+  width: 1%;
+}
+
+.c {
+  text-align: center;
+}
+
+.l {
+  text-align: left;
+}
+
+.command {
+  font-size: 2.5em;
+  font-weight: 700;
+}
+
+.max {
+  width: 100%;
+}
+
+.de {
+  background-color: #6D7B8D;
+}
+
+.tc {
+  background-color: #FFFFFF;
+}
+.we {
+  background-color: silver;
+}
+
+.ho {
+  background-color: #C30;
+}
+
+.dp {
+  background-color: #E8E8E8;
+}
+
+.bo {
+  background-color: #000;
+}
+
+.va {
+  background-color: #33C;
+}
+
+.vs {
+  background-color: #0CF;
+}
+
+.sa {
+  background-color: #090;
+}
+
+.ss {
+  background-color: #0F0;
+}
+
+.pa {
+  background-color: #CC0;
+}
+
+.ps {
+  background-color: #FF0;
+}
+
+.oa {
+  background-color: orchid;
+}
+
+.os {
+  background-color: #F26DCD;
+}
+
+.aa {
+  background-color: #FF9;
+}
+
+.as {
+  background-color: #EEE8AA;
+}
+
+.ba {
+  background-color: #FE6F5E;
+}
+
+.bs {
+  background-color: #BF4F51;
+}
+
+.fa {
+  background-color: #F7E98E;
+}
+
+.fs {
+  background-color: #EEDC82;
+}
+
+.ja {
+  background-color: #BDDA57;
+}
+
+.js {
+  background-color: #29AB87;
+}
+
+.ma {
+  background-color: #89CFF0;
+}
+
+.ms {
+  background-color: #CCFFFF;
+}
+
+.da {
+  background-color: orange;
+}
+
+.ds {
+  background-color: #CC8400;
+}
+
+.wa {
+  background-color: #F1A7FE;
+}
+
+.ws {
+  background-color: #A76BCF;
+}
