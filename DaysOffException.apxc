@@ -1,0 +1,4 @@
+/**
+ * provides custom exceptions for Days Off
+ */ 
+public class DaysOffException extends Exception {}
