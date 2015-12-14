@@ -1,0 +1,522 @@
+/**
+ * This class provides the data for the Days Off Calendar
+ */ 
+public class CalendarController{
+    public List<List<CalendarProperties>> listEmployees{get;set;}
+    /**
+     * stores the dates of holidays not on a weekend, must be updated each year
+     */ 
+    private Map<Date,String> holidayMap {
+        get {return new Map<Date, String>{
+            //2012
+            getDate(2012,2,20) => holidays.get(2),
+            getDate(2012,5,28) => holidays.get(3),
+            getDate(2012,7,4) => holidays.get(4),
+            getDate(2012,9,3) => holidays.get(5),
+            getDate(2012,10,8) => holidays.get(6),
+            getDate(2012,11,22) => holidays.get(7),
+            getDate(2012,11,23) => holidays.get(8),
+            //2013    
+            getDate(2013,1,1) => holidays.get(0),
+            getDate(2013,1,21) => holidays.get(1),
+            getDate(2013,2,18) => holidays.get(2),
+            getDate(2013,5,27) => holidays.get(3),
+            getDate(2013,7,4) => holidays.get(4),
+            getDate(2013,9,2) => holidays.get(5),
+            getDate(2013,10,14) => holidays.get(6),
+            getDate(2013,11,28) => holidays.get(7),
+            getDate(2013,11,29) => holidays.get(8),
+            getDate(2013,12,25) => holidays.get(9),
+            //2014    
+            getDate(2014,1,1) => holidays.get(0),
+            getDate(2014,1,20) => holidays.get(1),
+            getDate(2014,2,17) => holidays.get(2),
+            getDate(2014,5,26) => holidays.get(3),
+            getDate(2014,7,4) => holidays.get(4),
+            getDate(2014,9,1) => holidays.get(5),
+            getDate(2014,10,13) => holidays.get(6),
+            getDate(2014,11,27) => holidays.get(7),
+            getDate(2014,11,28) => holidays.get(8),
+            getDate(2014,12,25) => holidays.get(9),
+            //2015    
+            getDate(2015,1,1) => holidays.get(0),
+            getDate(2015,1,19) => holidays.get(1),
+            getDate(2015,2,16) => holidays.get(2),
+            getDate(2015,5,25) => holidays.get(3),
+            getDate(2015,7,3) => holidays.get(4),
+            getDate(2015,9,7) => holidays.get(5),
+            getDate(2015,10,12) => holidays.get(6),
+            getDate(2015,11,26) => holidays.get(7),
+            getDate(2015,11,27) => holidays.get(8),
+            getDate(2015,12,25) => holidays.get(9)
+        };}
+        set;
+    }
+    /**
+     * used as shorthand for date.newInstance(year, month, day)
+     */
+    private Date getDate(Integer year,Integer month,Integer day){
+        return date.newInstance(year, month, day);
+    }
+    /**
+     * stores the names of the holidays for the holidayMap, no punctuation allowed
+     */ 
+    private List<String> holidays {
+        get {return new List<String>{
+            'New Years Day',         
+            'Martin L King Jr Day',  
+            'Presidents Day',        
+            'Memorial Day',          
+            'Independance Day',      
+            'Labor Day',             
+            'Columbus Day',          
+            'Thanksgiving',          
+            'Day after Thanksgiving',
+            'Christmas'              
+        };}
+        set;
+    }
+    /**
+     * returns true if date is a blackout day (on the last two weeks of each quarter)
+     */ 
+    public boolean isBlackout (Date toCheck){       
+        Integer daysInMonth = Date.daysInMonth(toCheck.year(), toCheck.month());
+        Integer blackout = daysInMonth - 14; 
+        if (toCheck.month() == 3  && toCheck.day() > blackout) return true;
+        else if(toCheck.month() == 6  && toCheck.day() > blackout) return true; 
+        else if(toCheck.month() == 9  && toCheck.day() > blackout) return true;
+        else if(toCheck.month() == 12 && toCheck.day() > blackout) return true;
+        else return false;     
+    }
+    /**
+     * returns true if date is defined in the holidayMap
+     */
+    public boolean isHoliday (Date toCheck){
+        return holidayMap.containsKey(toCheck);
+    }
+    /**
+     * returns the name of holiday if date found in the holidayMap
+     */ 
+    public String getHolidayName (Date toCheck){
+        return holidayMap.get(toCheck);
+    }
+    /**
+     * returns true if date is a weekend day
+     */ 
+    @TestVisible
+    private boolean isWeekend (Date toCheck){
+        if(datetime.newInstance(toCheck, Time.newInstance(0, 0, 0, 0)).format('EEE')=='Sat' 
+           || datetime.newInstance(toCheck, Time.newInstance(0, 0, 0, 0)).format('EEE')=='Sun')
+            return true;
+        else return false;
+    }
+    /**
+     * returns true if date is today
+     */ 
+    @TestVisible
+    private boolean isToday (Date toCheck){
+        if(toCheck == Date.today()) return true;
+        else return false;
+    }
+    public integer month{get;set;}
+    private integer year;
+    private List<String> monthNames=new list<String>{
+        'January','February','March','April','May','June',
+        'July','August','September','October','November','December'};
+    /**
+     * provides the action for the button to go to the previous month
+     */ 
+    public void prevMonth(){
+        Date previousMonth = (getDate(year,month,1)).addMonths(-1);
+        year = previousMonth.year();
+        month = previousMonth.month();
+        genCalendar();
+    }
+    /**
+     * provides the action for the button to go to the next month
+     */ 
+    public void nextMonth(){
+        Date nextMonth = (getDate(year,month,1)).addMonths(1);
+        year = nextMonth.year();
+        month = nextMonth.month();
+        genCalendar();
+    }      
+    public CalendarController() {   
+        month = date.today().month();
+        year = date.today().year();
+        genCalendar();
+    }
+    public CalendarController(ApexPages.StandardController s){
+        month = date.today().month();
+        year = date.today().year();
+        genCalendar();
+        setHeaders();
+    }
+    /**
+     * sets the filename for the print view
+     */ 
+    @TestVisible
+    private void setHeaders(){
+        Date today = date.today();
+        ApexPages.currentPage().getHeaders().put('content-disposition', 'attachment; filename=' +
+                                                 monthNames.get(month-1) + ' Days Off Calendar ' + 
+                                                 'as of ' + today.format() + '.pdf');
+    }
+    /** 
+     * generates the calendar
+     */ 
+    public void genCalendar(){                
+        listEmployees=new List<List<CalendarProperties>>();
+        List<CalendarProperties> listDays;
+        
+        String color;
+        String headerColor='';
+        String defaultColor='#6D7B8D';
+        String weColor='#C0C0C0';
+        String todayColor='#FFFFFF';
+        String holidayColor='#CC3300';
+        String dptColor='#E8E8E8';
+        String popup;
+        String tempDpt='';
+        String blackoutColor = '#000';
+        
+        if(ApexPages.currentPage().getParameters().get('m')!=null){
+            month=Integer.valueOf(ApexPages.currentPage().getParameters().get('m'));}
+        
+        Date dStart = getDate(year,month,1);
+        Date dEnd = getDate(year,month,date.daysInMonth(year , month ));
+        Date dTest;
+        
+        
+        //Row with Days number
+        listDays=new List<CalendarProperties>();
+        //Empty cell
+        listDays.add(new CalendarProperties(20,1,headerColor,'',''));
+        
+        //Days labels
+        for (integer i=1; i <= date.daysInMonth(year,month); i++) {
+            dTest=getDate(year,month,i);
+            if(isWeekend(dTest)){
+                listDays.add(new CalendarProperties(2,2,weColor,String.valueof(i),''));
+            }
+            else if(isHoliday(dTest)){       
+                listDays.add(new CalendarProperties(2,2,holidayColor,String.valueof(i),getHolidayName(dTest)));
+            }
+            else if(isBlackout(dTest)){listDays.add(new CalendarProperties(2,2,blackoutColor,String.valueof(i),
+                                                    String.valueOf(monthNames[month-1] + ' ' + i + ' - Blackout Day')));
+            }
+            else if(isToday(dTest)){
+                listDays.add(new CalendarProperties(2,2,todayColor,String.valueof(i),''));
+            }
+            else{            
+                listDays.add(new CalendarProperties(2,2,defaultColor,String.valueof(i),''));
+            }            
+            
+        }
+        listEmployees.add(listDays);
+        
+        //Row with AM-PM
+        listDays=new List<CalendarProperties>();
+        //Empty cell
+        listDays.add(new CalendarProperties(20,1,headerColor,'',''));
+        
+        //Days labels
+        for (integer i=1; i<=date.daysInMonth(year , month ); i++) {
+            dTest=date.newInstance(year,month,i);
+            if(isWeekend(dTest)){ 
+                listDays.add(new CalendarProperties(1,1,weColor,'A',''));
+                listDays.add(new CalendarProperties(1,1,weColor,'P',''));
+            }
+            else if(isHoliday(dTest)){       
+                listDays.add(new CalendarProperties(1,1,holidayColor,'A',getHolidayName(dTest)));        
+                listDays.add(new CalendarProperties(1,1,holidayColor,'P',getHolidayName(dTest)));
+            }
+            else if(isBlackout(dTest)){listDays.add(new CalendarProperties(1,1,blackoutColor,'A',String.valueOf(monthNames[month-1] + ' ' + i + ' - Blackout Day'))); listDays.add(new CalendarProperties(1,1,blackoutColor,'P',String.valueOf(monthNames[month-1] + ' ' + i + ' - Blackout Day')));
+            }
+            else if(isToday(dTest)){
+                listDays.add(new CalendarProperties(1,1,todayColor,'A',''));
+                listDays.add(new CalendarProperties(1,1,todayColor,'P',''));
+            }
+            else{   
+                listDays.add(new CalendarProperties(1,1,defaultColor,'A',''));       
+                listDays.add(new CalendarProperties(1,1,defaultColor,'P',''));
+            }
+            
+        }
+        listEmployees.add(listDays);
+        
+        //Row Employees
+        Date sDate=getDate(year,month,1);
+        Date eDate=getDate(year,month,date.daysInMonth(year,month));
+        List<Days_Off_Request__c> daysOffReq=[Select Employee__c,End_AM_PM__c,Start_AM_PM__c
+            ,Start_Date__c,End_Date__c,Reason__c,Color__c,Status__c
+            FROM Days_Off_Request__c
+            WHERE ((Start_Date__c >=: sDate and Start_Date__c <=: eDate) or 
+                (End_Date__c >=: sDate and End_Date__c <=: eDate) or 
+                (Start_Date__c <=: sDate and End_Date__c >=: sDate) or 
+                (Start_Date__c <=: eDate and End_Date__c >=: eDate))
+                AND Status__c!='Canceled'
+				AND Status__c!='Declined'];
+        Map<String,List<String>> mReq=new Map<String,List<String>>();
+        
+        for(Days_Off_Request__c dor:[Select Employee__c,End_AM_PM__c,Start_AM_PM__c
+            ,Start_Date__c,End_Date__c,Reason__c,Color__c,Status__c
+            FROM Days_Off_Request__c
+            WHERE ((Start_Date__c >=: sDate and Start_Date__c <=: eDate) or 
+                (End_Date__c >=: sDate and End_Date__c <=: eDate) or 
+                (Start_Date__c <=: sDate and End_Date__c >=: sDate) or 
+                (Start_Date__c <=: eDate and End_Date__c >=: eDate))
+                AND Status__c!='Canceled'
+				AND Status__c!='Declined']){
+            for (integer i=0; i<=dor.Start_Date__c.daysBetween(dor.End_Date__c); i++) {
+                dTest=dor.Start_Date__c.addDays(+i);
+                if(!(isHoliday(dTest) || isWeekend(dTest))){
+                    if(!(i==0 && dor.Start_AM_PM__c=='PM')){
+                        mReq.put(dor.Employee__c + String.valueOf(dTest) + 'AM',new List<string>{
+                            dor.Reason__c,dor.Color__c,dor.Status__c,dor.Id});
+                    }
+                    if(!(i==dor.Start_Date__c.daysBetween(dor.End_Date__c) && dor.End_AM_PM__c=='AM' )){
+                        mReq.put(dor.Employee__c + String.valueOf(dTest) + 'PM',new List<string>{
+                            dor.Reason__c,dor.Color__c,dor.Status__c,dor.Id});
+                    }
+                }
+            }
+        }
+        for (Employee__c emp: [Select Id,FULL_NAME__C,Department__c
+                               from Employee__c 
+                               where Active__c=true 
+                               ORDER BY OrderDpt__c,Order__c,FULL_NAME__C]){
+            if(tempDpt!=emp.Department__c){
+                //Row with Department Name
+                listDays=new List<CalendarProperties>();
+                //Empty cell
+                listDays.add(new CalendarProperties(
+                    20,date.daysInMonth(year,month)*2+1,dptColor,emp.Department__c,'','left'));
+                
+                //Days labels
+                listEmployees.add(listDays);
+                tempDpt=emp.Department__c;
+            }
+            listDays=new List<CalendarProperties>();
+           
+            //Employee Name
+            listDays.add(new CalendarProperties(20,1,headerColor,'<span class="w">___</span>' + 
+                                                emp.FULL_NAME__C,'','left',emp.Id));
+                        
+            for (integer i=1; i<=date.daysInMonth(year,month); i++) {
+                dTest=getDate(year,month,i);
+                String AM = emp.id + String.valueOf(getDate(year,month,i)) + 'AM';
+                String PM = emp.id + String.valueOf(getDate(year,month,i)) + 'PM';
+                String letter;
+                if(mReq.containsKey(AM)){
+                    //AM day type
+                    if((mReq.get(AM).get(0)).subString(0,1).toLowerCase() == 'w') letter = 'r';
+                    else letter = (mReq.get(AM).get(0)).subString(0,1).toLowerCase();
+                    listDays.add(
+                        new CalendarProperties(
+                            1,1,
+                            mReq.get(AM).get(1),
+                            letter, 
+                            mReq.get(AM).get(2) + ': ' + mReq.get(AM).get(0) + ' - ' + emp.Full_Name__c,
+                            'center',
+                        	mReq.get(AM).get(3)));
+                }else if(isHoliday(dTest)){       
+                   listDays.add(new CalendarProperties(
+                        1,1,listEmployees.get(1).get((i-1)*2+1).bgColor,'',getHolidayName(dTest)));
+                }else if(isBlackout(dTest)){listDays.add(new CalendarProperties(
+                        1,1,listEmployees.get(1).get((i-1)*2+1).bgColor,'',
+                       String.valueOf(monthNames[month-1] + ' ' + i + ' - Blackout Day')));
+                }else{    
+                    listDays.add(new CalendarProperties(
+                        1,1,listEmployees.get(1).get((i-1)*2+1).bgColor,'',''));
+                }
+                if(mReq.containsKey(PM)){
+                    //PM day type
+                    if((mReq.get(PM).get(0)).subString(0,1).toLowerCase() == 'w') letter = 'r';
+                    else letter = (mReq.get(PM).get(0)).subString(0,1).toLowerCase();
+                    listDays.add(
+                        new CalendarProperties(
+                            1,1,
+                            mReq.get(PM).get(1),
+                            letter,
+                            mReq.get(PM).get(2) + 
+                            ': ' + mReq.get(PM).get(0) + ' - ' + emp.Full_Name__c,
+                        	'center',
+                        	mReq.get(PM).get(3)));
+               }else if(isHoliday(dTest)){       
+                   listDays.add(new CalendarProperties(
+                       1,1,listEmployees.get(1).get((i-1)*2+1).bgColor,'',getHolidayName(dTest)));
+               }else if(isBlackout(dTest)){listDays.add(new CalendarProperties(
+                       1,1,listEmployees.get(1).get((i-1)*2+1).bgColor,'',
+                       String.valueOf(monthNames[month-1] + ' ' + i + ' - Blackout Day')));
+               }else{
+                   listDays.add(
+                       new CalendarProperties(1,1,listEmployees.get(1).get((i-1)*2+1).bgColor,'',''));
+               }                                        
+            }            
+            listEmployees.add(listDays);
+        }
+    }
+    /**
+     * gets month name
+     */ 
+    public String getMonthName(){
+        return monthNames.get(month-1) + ' ' + year;
+    }
+    /**
+     * used to configure the html for the calendar page
+     */ 
+    @TestVisible
+    class CalendarProperties{
+        public Integer width{get;set;}
+        public Integer colSpan{get;set;}
+        public String bgColor{get;set;}
+        public String text{get;set;}
+        public String popup{get;set;}
+        public String align{get;set;}
+        public String beginLink{get;set;}
+        public String endLink{get;set;}
+        public String color{get;set;}
+        public String column{get;set;}
+        /**
+         * constructs an instance of calendar properties with default parameters
+         */ 
+        public CalendarProperties(){
+            align = 'center';
+            column = getColumn();
+        }
+        /**
+         * constructs an instance of calendar properties with a given width, colspan, bgcolor,
+         * text, and popup.
+         */ 
+        public CalendarProperties(Integer width,Integer colspan,String bgcolor,String text,String popup){
+            this.width = width;
+            this.colSpan = colspan;
+            this.bgColor = bgcolor;
+            this.text = text;
+            this.popup = popup;
+            align = 'center';
+            column = getColumn();
+        }
+        /**
+         * constructs an instance of calendar properties with a given width, colspan, bgcolor,
+         * text, popup, and align.
+         */ 
+        public CalendarProperties(Integer width,Integer colspan,String bgcolor,String text,String popup,
+                                   String align)
+        {
+            this.width = width;
+            this.colSpan = colspan;
+            this.bgColor = bgcolor;
+            this.text = text;
+            this.popup = popup;
+            this.align = align;
+            column = getColumn();
+        }
+        /**
+         * constructs an instance of calendar properties with a given width, colspan, bgcolor,
+         * text, popup, align, and linkId.
+         */ 
+        public CalendarProperties(Integer width,Integer colspan,String bgcolor,String text,String popup,
+                                   String align,String linkId)
+        {
+            this.width = width;
+            this.colSpan = colspan;
+            this.bgColor = bgcolor;
+            this.text = text;
+            this.popup = popup;
+            this.align = align;
+            beginLink = '<a href="/' + linkId + '">';
+            endLink = '</a>';
+            column = getColumn();
+        }
+        /**
+         * assembles the td tag based on available data to reduce payload 
+         * see CalendarPage.css static resource for the styles used
+         */ 
+        @TestVisible
+        private String getColumn(){
+            String widthClass = '';
+            String alignClass = '';
+            String colorClass = '';
+            String bgClass = '';
+            
+            String tdColSpan = '';
+            String tdBgColor = '';
+            String tdPopup = '';
+            String tdLink = '';
+            
+            if(width!=null){
+                if(width == 20) widthClass = 'e';
+                if(width == 2) widthClass = 'h';
+                if(width == 1) widthClass = 'b';
+            }
+            if(colSpan != null){
+                if(colSpan == 1) tdColSpan = ''; 
+                else {
+                    tdColSpan = String.valueOf(colSpan);
+                    tdColSpan = ' colspan=\'' + tdColSpan + '\'';
+                }
+            }
+            if(bgColor != null){
+                if(bgColor.length() != 0){
+                    if(bgColor == '#6D7B8D') bgClass = ' de w';
+                    else if(bgColor == '#C0C0C0') bgClass = ' we';
+                    else if(bgColor == '#CC3300') bgClass = ' ho';
+                    else if(bgColor == '#E8E8E8') bgClass = ' dp';
+                    else if(bgColor == '#000') bgClass = ' bo w';
+                    else if(bgColor == '#3333CC') bgClass = ' va w';
+                    else if(bgColor == '#00CCFF') bgClass = ' vs w';
+                    else if(bgColor == '#009900') bgClass = ' sa';
+                    else if(bgColor == '#00FF00') bgClass = ' ss';
+                    else if(bgColor == '#CCCC00') bgClass = ' pa';
+                    else if(bgColor == '#FFFF00') bgClass = ' ps';
+                    else if(bgColor == '#DA70D6') bgClass = ' oa';
+                    else if(bgColor == '#F26DCD') bgClass = ' os';
+                    else if(bgColor == '#FFFF99') bgClass = ' aa';
+                    else if(bgColor == '#EEE8AA') bgClass = ' as';
+                    else if(bgColor == '#FE6F5E') bgClass = ' ba';
+                    else if(bgColor == '#BF4F51') bgClass = ' bs';
+                    else if(bgColor == '#F7E98E') bgClass = ' fa';
+                    else if(bgColor == '#EEDC82') bgClass = ' fs';
+                    else if(bgColor == '#BDDA57') bgClass = ' ja w';
+                    else if(bgColor == '#29AB87') bgClass = ' js w';
+                    else if(bgColor == '#89CFF0') bgClass = ' ma';
+                    else if(bgColor == '#ALCAF1') bgClass = ' ms';
+                    else if(bgColor == '#FFA500') bgClass = ' da';
+                    else if(bgColor == '#CC8400') bgClass = ' ds';
+                    else if(bgColor == '#F1A7FE') bgClass = ' wa';
+                    else if(bgColor == '#A76BCF') bgClass = ' ws w';
+                    else if(bgColor == '#FFFFFF') bgClass = ' tc'; 
+                    else tdBgColor = ' bgColor=\'' + bgColor + '\'';
+                }
+            }
+            if(popup != null) if(popup.length() != 0)
+                tdPopup = ' onmouseover="nhpup.popup(\'' + popup.replace('\'', '') + '\')"';
+            
+            if(align != null){
+                if(align.length()!=0) {
+                    if(align == 'center') alignClass = ' c';
+                    if(align == 'left') alignClass = ' l';
+                }
+            }
+            if(color != null) if(color.length() != 0) colorClass = 'w ';
+           
+            if(beginLink != null && Text != null){
+                if(beginLink.length() != 0 && Text.length() != 0) {
+                    tdLink = beginLink + Text + endLink;
+                }
+            }
+
+            else if (Text != null) {
+                if(Text.length() != 0) {
+                    tdLink = Text;
+                }
+            }
+                 
+            String tdClass = ' class="' + colorClass + widthClass + alignClass + bgClass + '"';
+            
+            return '<td' + tdColSpan + tdBgColor + tdPopup + tdClass + '>' + tdLink + '</td>';
+        }
+    }
+}
